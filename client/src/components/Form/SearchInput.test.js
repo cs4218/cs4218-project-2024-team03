@@ -19,7 +19,10 @@ jest.mock("react-router-dom", () => {
 const Router = require("react-router-dom");
 describe("test SearchInput component", () => {
   beforeEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
   });
   it("should allow typing search query", () => {
     render(
@@ -183,9 +186,10 @@ describe("test SearchInput component", () => {
     fireEvent.click(screen.getByText("Search"));
     await waitFor(() =>
       expect(axios.get).toHaveBeenCalledWith(
-        "/api/v1/product/search/placeholder"
+        "/api/v1/product/search/placeholder" // Expect the trimmed value
       )
     );
+    console.log(axios.get.mock.calls);
   });
   it.failing("handles special character in the search string", async () => {
     axios.get.mockResolvedValueOnce({

@@ -20,6 +20,9 @@ describe("Search Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it("displays search results correctly", () => {
     useSearch.mockReturnValueOnce([
       {

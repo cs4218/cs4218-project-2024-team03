@@ -56,6 +56,9 @@ describe("test ProductDetails component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it("gets the product detail with slug", async () => {
     axios.get.mockResolvedValueOnce({ data: [] });
     axios.get.mockResolvedValueOnce(sample_product);
