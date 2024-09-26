@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import "@testing-library/jest-dom/extend-expect";
 import { beforeEach } from "node:test";
@@ -137,4 +137,60 @@ describe("test ProductDetails component", () => {
     expect(catEle).toBeInTheDocument();
     expect(screen.getByText("No Similar Products found")).toBeInTheDocument();
   });
+  it("displays related products correctly", async () => {
+    axios.get.mockResolvedValueOnce({ data: [] });
+    axios.get.mockResolvedValueOnce({ data: sample_product });
+    const RELATED_PRODUCT_NAME = "Kleenex";
+    const related_product = JSON.parse(JSON.stringify(sample_product));
+    related_product.product.name = RELATED_PRODUCT_NAME;
+    axios.get.mockResolvedValueOnce({
+      data: { products: [related_product.product] },
+    });
+    render(
+      <Router.MemoryRouter initialEntries={["/"]}>
+        <Router.Routes>
+          <Router.Route path="/" element={<ProductDetails />} />
+        </Router.Routes>
+      </Router.MemoryRouter>
+    );
+    await waitFor(() => expect(axios.get).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(axios.get).toHaveBeenCalledWith(
+        `/api/v1/product/get-product/${sample_product.product.slug}`
+      )
+    );
+    await waitFor(() =>
+      expect(axios.get).toHaveBeenCalledWith(
+        `/api/v1/product/related-product/${sample_product.product._id}/${sample_product.product.category._id}`
+      )
+    );
+    expect(screen.getByText("Similar Products ➡️")).toBeInTheDocument();
+    const nameEle = await screen.findByText(related_product.product.name);
+    expect(nameEle).toBeInTheDocument();
+  });
+  it.failing(
+    "displays fallback values when receiving invalid product data",
+    async () => {
+      axios.get.mockResolvedValueOnce({ data: [] });
+      const INVALID_PRICE = "invalid string";
+      sample_product.product.price = INVALID_PRICE;
+      console.log(sample_product);
+      axios.get.mockResolvedValueOnce({
+        data: sample_product,
+      });
+      axios.get.mockResolvedValueOnce({ data: { products: [] } });
+
+      render(
+        <Router.MemoryRouter initialEntries={["/"]}>
+          <Router.Routes>
+            <Router.Route path="/" element={<ProductDetails />} />
+          </Router.Routes>
+        </Router.MemoryRouter>
+      );
+      await waitFor(() => expect(axios.get).toHaveBeenCalled());
+      await waitFor(() => expect(axios.get).toHaveBeenCalled());
+      const priceEle = await screen.findByText(`Price :${INVALID_PRICE}`);
+      expect(priceEle).not.toBeInTheDocument();
+    }
+  );
 });

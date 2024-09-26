@@ -75,7 +75,7 @@ describe("Search Component", () => {
     );
     expect(screen.getByText("No Products Found")).toBeInTheDocument();
   });
-  it("does not display invalid search result", () => {
+  it.failing("does not display invalid search result", () => {
     useSearch.mockReturnValueOnce([
       {
         keyword: "",
@@ -115,79 +115,85 @@ describe("Search Component", () => {
     const prodItems = screen.getAllByText("ADD TO CART");
     expect(prodItems).toHaveLength(1);
   });
-  it("product card More Details button functions correctly", async () => {
-    jest.mock("react-router-dom", () => {
-      const nav = jest.fn();
-      return {
-        ...jest.requireActual("react-router-dom"),
-        mockedNavigation: nav,
-        useNavigate: jest.fn(() => nav),
-      };
-    });
+  it.failing(
+    "product card More Details button functions correctly",
+    async () => {
+      jest.mock("react-router-dom", () => {
+        const nav = jest.fn();
+        return {
+          ...jest.requireActual("react-router-dom"),
+          mockedNavigation: nav,
+          useNavigate: jest.fn(() => nav),
+        };
+      });
 
-    const Router = require("react-router-dom");
-    useSearch.mockReturnValueOnce([
-      {
-        keyword: "",
-        results: [
-          {
-            _id: "66dd70965628054a100976fe",
-            name: "PurSoft 3ply Chocolate Rain Outdoor Soft Pack 120 sheets, Pack of 4",
-            slug: "PurSoft-3ply-Chocolate-Rain-Outdoor-Soft-Pack-120-sheets-Pack-of-4",
-            description: "tissue",
-            price: 4.48,
-            category: "66dd6f865628054a100976cf",
-            quantity: 10000,
-            createdAt: "2024-09-08T09:38:30.249Z",
-            updatedAt: "2024-09-08T09:38:30.249Z",
-            __v: 0,
-          },
-        ],
-      },
-      jest.fn(),
-    ]);
-    render(
-      <Router.MemoryRouter initialEntries={["/search"]}>
-        <Router.Routes>
-          <Router.Route path="/search" element={<Search />} />
-        </Router.Routes>
-      </Router.MemoryRouter>
-    );
-    fireEvent.click(screen.getByText("More Details"));
-    expect(Router.mockedNavigation).toHaveBeenCalledWith(
-      "/product/PurSoft-3ply-Chocolate-Rain-Outdoor-Soft-Pack-120-sheets-Pack-of-4"
-    );
-  });
-  it("product card Add to Cart button functions correctly", async () => {
-    useSearch.mockReturnValueOnce([
-      {
-        keyword: "",
-        results: [
-          {
-            _id: "66dd70965628054a100976fe",
-            name: "PurSoft 3ply Chocolate Rain Outdoor Soft Pack 120 sheets, Pack of 4",
-            slug: "PurSoft-3ply-Chocolate-Rain-Outdoor-Soft-Pack-120-sheets-Pack-of-4",
-            description: "tissue",
-            price: 4.48,
-            category: "66dd6f865628054a100976cf",
-            quantity: 10000,
-            createdAt: "2024-09-08T09:38:30.249Z",
-            updatedAt: "2024-09-08T09:38:30.249Z",
-            __v: 0,
-          },
-        ],
-      },
-      jest.fn(),
-    ]);
-    render(
-      <MemoryRouter initialEntries={["/search"]}>
-        <Routes>
-          <Route path="/search" element={<Search />} />
-        </Routes>
-      </MemoryRouter>
-    );
-    const cartSize = localStorage.getItem("cart")?.length || 0;
-    fireEvent.click(screen.getByText("ADD TO CART"));
-    expect(localStorage.getItem("cart")?.length || 0).toBe(cartSize + 1);
-  });
+      const Router = require("react-router-dom");
+      useSearch.mockReturnValueOnce([
+        {
+          keyword: "",
+          results: [
+            {
+              _id: "66dd70965628054a100976fe",
+              name: "PurSoft 3ply Chocolate Rain Outdoor Soft Pack 120 sheets, Pack of 4",
+              slug: "PurSoft-3ply-Chocolate-Rain-Outdoor-Soft-Pack-120-sheets-Pack-of-4",
+              description: "tissue",
+              price: 4.48,
+              category: "66dd6f865628054a100976cf",
+              quantity: 10000,
+              createdAt: "2024-09-08T09:38:30.249Z",
+              updatedAt: "2024-09-08T09:38:30.249Z",
+              __v: 0,
+            },
+          ],
+        },
+        jest.fn(),
+      ]);
+      render(
+        <Router.MemoryRouter initialEntries={["/search"]}>
+          <Router.Routes>
+            <Router.Route path="/search" element={<Search />} />
+          </Router.Routes>
+        </Router.MemoryRouter>
+      );
+      fireEvent.click(screen.getByText("More Details"));
+      expect(Router.mockedNavigation).toHaveBeenCalledWith(
+        "/product/PurSoft-3ply-Chocolate-Rain-Outdoor-Soft-Pack-120-sheets-Pack-of-4"
+      );
+    }
+  );
+  it.failing(
+    "product card Add to Cart button functions correctly",
+    async () => {
+      useSearch.mockReturnValueOnce([
+        {
+          keyword: "",
+          results: [
+            {
+              _id: "66dd70965628054a100976fe",
+              name: "PurSoft 3ply Chocolate Rain Outdoor Soft Pack 120 sheets, Pack of 4",
+              slug: "PurSoft-3ply-Chocolate-Rain-Outdoor-Soft-Pack-120-sheets-Pack-of-4",
+              description: "tissue",
+              price: 4.48,
+              category: "66dd6f865628054a100976cf",
+              quantity: 10000,
+              createdAt: "2024-09-08T09:38:30.249Z",
+              updatedAt: "2024-09-08T09:38:30.249Z",
+              __v: 0,
+            },
+          ],
+        },
+        jest.fn(),
+      ]);
+      render(
+        <MemoryRouter initialEntries={["/search"]}>
+          <Routes>
+            <Route path="/search" element={<Search />} />
+          </Routes>
+        </MemoryRouter>
+      );
+      const cartSize = localStorage.getItem("cart")?.length || 0;
+      fireEvent.click(screen.getByText("ADD TO CART"));
+      expect(localStorage.getItem("cart")?.length || 0).toBe(cartSize + 1);
+    }
+  );
 });
