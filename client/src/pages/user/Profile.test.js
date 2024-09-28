@@ -18,7 +18,7 @@ jest.mock('../../context/cart', () => ({
 }));
 
 jest.mock('../../context/search', () => ({
-  useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
+  useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) 
 }));  
 
 Object.defineProperty(window, 'localStorage', {
