@@ -160,9 +160,11 @@ describe('Profile Component', () => {
     expect(toast.error).toHaveBeenCalledWith("Something went wrong");
   })
 
-  fit('should display error message when updating profile fails from server', async () => {
+  it('should display error message when updating profile fails from server', async () => {
     axios.put.mockResolvedValueOnce({
-      error: "Password is required and 6 character long"
+      data: {
+        error: "Password is required and 6 character long"
+      }
     })
 
     render(
@@ -175,7 +177,7 @@ describe('Profile Component', () => {
 
     fireEvent.change(screen.getByPlaceholderText('Enter Your Name'), { target: { value: 'Username' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Email'), { target: { value: 'username@example.com' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: '234' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: '2323' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Phone'), { target: { value: '1234567890' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Address'), { target: { value: '123 Street' } });
 
