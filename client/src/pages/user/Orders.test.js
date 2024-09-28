@@ -3,7 +3,6 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Orders from './Orders';
 import axios from 'axios';
 import React from 'react'
-import { useAuth } from '../../context/auth';
 
 jest.mock('axios');
 
