@@ -42,7 +42,7 @@ const Header = () => {
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
               <SearchInput />
               <li className="nav-item">
-                <NavLink to="/" className="nav-link ">
+                <NavLink to="/" className="nav-link " data-testid="home-btn">
                   Home
                 </NavLink>
               </li>
@@ -51,12 +51,17 @@ const Header = () => {
                   className="nav-link dropdown-toggle"
                   to={"/categories"}
                   data-bs-toggle="dropdown"
+                  data-testid="categories-btn"
                 >
                   Categories
                 </Link>
-                <ul className="dropdown-menu">
+                <ul className="dropdown-menu" data-testid="dropdown-menu">
                   <li>
-                    <Link className="dropdown-item" to={"/categories"}>
+                    <Link
+                      className="dropdown-item"
+                      to={"/categories"}
+                      data-testid="all-categories"
+                    >
                       All Categories
                     </Link>
                   </li>
