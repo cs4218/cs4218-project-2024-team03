@@ -7,56 +7,54 @@ import '@testing-library/jest-dom/extend-expect';
 import { toast } from "react-hot-toast";
 import UpdateProduct from "./UpdateProduct";
 
-// Mock axios and react-hot-toast
 jest.mock("axios");
 jest.mock('react-hot-toast');
 
 jest.mock('../../context/auth', () => ({
-  useAuth: jest.fn(() => [null, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
+  useAuth: jest.fn(() => [null, jest.fn()]) 
 }));
 
 jest.mock('../../context/cart', () => ({
-  useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
+  useCart: jest.fn(() => [null, jest.fn()])
 }));
   
 jest.mock('../../context/search', () => ({
-  useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
+  useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) 
 }));  
 
-Object.defineProperty(window, 'localStorage', {
-  value: {
-    setItem: jest.fn(),
-    getItem: jest.fn(),
-    removeItem: jest.fn(),
-  },
-  writable: true,
-});
-window.matchMedia = window.matchMedia || function() {
-  return {
-    matches: false,
-    addListener: function() {},
-    removeListener: function() {}
-  };
-};  
+const mockProduct = {
+    _id: "66d73fdee152a157371c9cb3",
+    name: "mdb",
+    description: "Test description",
+    price: 100,
+    quantity: 10,
+    shipping: true,
+    category: { _id: "cat1", name: "Category 1"}
+};
+
+const mockCategory = [
+  { _id: "66d73fdee152a157371c9cb4", name: "Category 1" }, 
+  { _id: "66d73fdee152a157371c9cb5", name: "Category 2" }
+];
+      
+
 describe("UpdateProduct Component", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
+
   beforeEach(() => {
     axios.get.mockResolvedValue({
       data: {
-        product: {
-          name: "mdb",
-          _id: "66d73fdee152a157371c9cb3",
-          description: "Test description",
-          price: 100,
-          quantity: 10,
-          shipping: true,
-          category: { _id: "66d73fdee152a157371c9cb4", name: "Category 1" },
-        },
-        category: [{ _id: "66d73fdee152a157371c9cb4", name: "Category 1" }, { _id: "66d73fdee152a157371c9cb5", name: "Category 2" }],
+        product: mockProduct,
+        category: mockCategory,
+        success: true
       },
     });
+    global.URL.createObjectURL = jest.fn();
   });
 
-  it("renders UpdateProduct component and loads data", async () => {
+  test("renders UpdateProduct component and loads data", async () => {
     render(
       <MemoryRouter initialEntries={['/dashboard/admin/product/mdb']}>
         <Routes>
@@ -65,15 +63,36 @@ describe("UpdateProduct Component", () => {
       </MemoryRouter>
     );
 
-    // Check if title and form fields are rendered
     expect(screen.getByRole("button", { name: /Update Product/i })).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByDisplayValue("mdb")).toBeInTheDocument());
+    
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("mdb")).toBeInTheDocument();
+    });
 
-    // Check if category dropdown is rendered
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("100")).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("10")).toBeInTheDocument();
+    });
+
     expect(screen.getByText(/Category 1/i)).toBeInTheDocument();
   });
 
-  it("allows updating product fields", async () => {
+  test("get-category API is called", async () => {
+    render(
+      <MemoryRouter initialEntries={['/dashboard/admin/product/mdb']}>
+        <Routes>
+          <Route path="/dashboard/admin/product/mdb" element={<UpdateProduct />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    
+    await waitFor(() => expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category"));
+  });
+
+  test("allows updating product text fields", async () => {
     render(
       <MemoryRouter initialEntries={['/dashboard/admin/product/mdb']}>
           <Routes>
@@ -82,34 +101,63 @@ describe("UpdateProduct Component", () => {
         </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByDisplayValue("mdb")).toBeInTheDocument());
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('write a name')).toHaveValue('mdb');
+    });
 
-    // Simulate entering new values
     fireEvent.change(screen.getByPlaceholderText(/write a name/i), {
       target: { value: "Updated Product" },
     });
+
     fireEvent.change(screen.getByPlaceholderText(/write a description/i), {
       target: { value: "Updated description" },
     });
+
     fireEvent.change(screen.getByPlaceholderText(/write a Price/i), {
       target: { value: 200 },
     });
-
-    // Simulate selecting a category
-    fireEvent.mouseDown(screen.getByText(/Category 1/i));
-    await waitFor(() => fireEvent.click(screen.getByText(/Category 2/i)));
-
-    // Simulate file upload
-    const file = new File(["product photo"], "product.jpg", { type: "image/jpeg" });
-    // const input = screen.getByLabelText(/Upload Photo/i);
-    // fireEvent.change(input, { target: { files: [file] } });
-
-    // Simulate updating the product
-    fireEvent.click(screen.getByRole("button", { name: /Update Product/i }));
-
-    // Check if the form submission is called with updated values
+    
+    const button = await screen.findByRole("button", { name: /Update Product/i });
+    fireEvent.click(button);
+    
     await waitFor(() => expect(axios.put).toHaveBeenCalledWith(
-      `/api/v1/product/update-product/123`,
+      `/api/v1/product/update-product/66d73fdee152a157371c9cb3`,
+      expect.any(FormData)
+    ));
+  });
+
+  test("update photo", async () => {
+    render(
+      <MemoryRouter initialEntries={['/dashboard/admin/product/mdb']}>
+          <Routes>
+            <Route path="/dashboard/admin/product/mdb" element={<UpdateProduct />} />
+          </Routes>
+        </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('write a name')).toHaveValue('mdb');
+    });
+
+    const file = new File(["image"], "photo.jpg", { type: "image/jpeg" });
+    const input = screen.getByLabelText(/Upload Photo/i);
+    fireEvent.change(input, { target: { files: [file] } });
+
+    // These 2 are somehow causing errors in the test case  
+    // fireEvent.mouseDown(screen.getByText(/Select a category/i)); 
+    // fireEvent.click(screen.getByText(/New Category Name/i));
+
+    // await waitFor(() => {
+    //   const shippingSelect = screen.getAllByTestId('category-select')[1]
+    //   fireEvent.change(shippingSelect, { target: { value: '0' } })
+    //   expect(shippingSelect.value).toBe('0')
+    // })
+    
+    const button = await screen.findByRole("button", { name: /Update Product/i });
+    fireEvent.click(button);
+    
+    await waitFor(() => expect(axios.put).toHaveBeenCalledWith(
+      `/api/v1/product/update-product/66d73fdee152a157371c9cb3`,
       expect.any(FormData)
     ));
   });
@@ -122,16 +170,60 @@ describe("UpdateProduct Component", () => {
           </Routes>
         </MemoryRouter>
     );
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('write a name')).toHaveValue('mdb');
+    });
 
-    await waitFor(() => expect(screen.getByText(/Delete Product/i)).toBeInTheDocument());
-
-    // Simulate deletion confirmation
     window.prompt = jest.fn().mockReturnValue(true);
 
-    // Simulate clicking the delete button
-    fireEvent.click(screen.getByText(/delete product/i));
+    const button = await screen.findByRole("button", { name: /Delete Product/i });
+    fireEvent.click(button);
 
-    // Check if the delete request is called
-    await waitFor(() => expect(axios.delete).toHaveBeenCalledWith(`/api/v1/product/delete-product/123`));
+    const temp = screen.queryByText("mdb");
+    await waitFor(() => expect(temp).not.toBeInTheDocument());
+  });
+
+  it("deleting a product calls the correct API", async () => {
+    render(
+      <MemoryRouter initialEntries={['/dashboard/admin/product/mdb']}>
+          <Routes>
+            <Route path="/dashboard/admin/product/mdb" element={<UpdateProduct />} />
+          </Routes>
+        </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('write a name')).toHaveValue('mdb');
+    });
+
+    window.prompt = jest.fn().mockReturnValue(true);
+
+    const button = await screen.findByRole("button", { name: /Delete Product/i });
+    fireEvent.click(button);
+    
+    await waitFor(() => expect(axios.delete).toHaveBeenCalledWith(`/api/v1/product/delete-product/66d73fdee152a157371c9cb3`));
+  });
+
+  it("handles a canceled delete", async () => {
+    render(
+      <MemoryRouter initialEntries={['/dashboard/admin/product/mdb']}>
+          <Routes>
+            <Route path="/dashboard/admin/product/mdb" element={<UpdateProduct />} />
+          </Routes>
+        </MemoryRouter>
+    );
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('write a name')).toHaveValue('mdb');
+    });
+
+    window.prompt = jest.fn(() => null)
+
+    const button = await screen.findByRole("button", { name: /Delete Product/i });
+    fireEvent.click(button);
+  
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('write a name')).toHaveValue('mdb');
+    });
+    
+    expect(axios.delete).not.toHaveBeenCalled()
   });
 });

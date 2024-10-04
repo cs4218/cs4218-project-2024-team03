@@ -7,20 +7,19 @@ import { Modal } from "antd";
 import '@testing-library/jest-dom/extend-expect';
 import { toast } from "react-hot-toast";
 
-// Mock necessary modules
 jest.mock("axios");
 jest.mock('react-hot-toast');
 
 jest.mock('../../context/auth', () => ({
-  useAuth: jest.fn(() => [null, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
+  useAuth: jest.fn(() => [null, jest.fn()]) 
 }));
 
 jest.mock('../../context/cart', () => ({
-  useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
+  useCart: jest.fn(() => [null, jest.fn()]) 
 }));
   
 jest.mock('../../context/search', () => ({
-  useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
+  useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()])
 }));  
 
 Object.defineProperty(window, 'localStorage', {
@@ -45,7 +44,7 @@ describe("CreateCategory Component", () => {
     axios.get.mockResolvedValue({
       data: {
         success: true,
-        category: [{ _id: "123", name: "Test Category" }],
+        category: [{ _id: "123", name: "Category 1" }],
       },
     });
   });
@@ -58,13 +57,12 @@ describe("CreateCategory Component", () => {
           </Routes>
         </MemoryRouter>
     );
-
-    // Check if title and form are rendered
+    
     expect(screen.getByText(/Manage Category/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Enter New Category/i)).toBeInTheDocument();
 
-    // Wait for categories to load
-    await waitFor(() => expect(screen.getAllByText("Test Category")[0]).toBeInTheDocument());
+    await waitFor(() => expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category"));
+    await waitFor(() => expect(screen.getAllByText("Category 1")[0]).toBeInTheDocument());
   });
 
   it("allows creating a category", async () => {
@@ -102,11 +100,10 @@ describe("CreateCategory Component", () => {
         </MemoryRouter>
     );
 
-    // Simulate opening the edit modal
     const editButton = await screen.findByText(/Edit/i);
     fireEvent.click(editButton);
 
-    const input = screen.getByDisplayValue("Test Category");
+    const input = screen.getByDisplayValue("Category 1");
     fireEvent.change(input, { target: { value: "Updated Category" } });
 
     const submitButtons = screen.getAllByText(/Submit/i);
