@@ -21,7 +21,7 @@ describe("Users Component", () => {
 
     expect(screen.getByText(/All Users/i)).toBeInTheDocument();
   });
-  it("axios is called to fetch users", async () => {
+  test("axios is called to fetch users", async () => {
     render(<Users />);
 
     await waitFor(() => expect(axios.get).toHaveBeenCalledWith(`/api/v1/product/get-users`))
