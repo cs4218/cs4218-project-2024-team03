@@ -30,25 +30,6 @@ describe("Layout Component", () => {
     jest.clearAllMocks();
   });
 
-  it("should render meta tags and title correctly",async () => {
-    render(
-        <Layout
-          title="Test Title"
-          description="Test Description"
-          keywords="test,keywords"
-          author="Test Author"
-        >
-          <div>Test Children</div>
-        </Layout>
-    );
-
-    expect(document.title).toBe('Test Title');
-    expect(getMetaTag('description').getAttribute('content')).toBe('Test Description');
-    expect(getMetaTag('keywords').getAttribute('content')).toBe('test,keywords');
-    expect(getMetaTag('author').getAttribute('content')).toBe('Test Author');
-
-  });
-
   it("should render children and components correctly", () => {
     render(
         <Layout>
@@ -74,4 +55,32 @@ describe("Layout Component", () => {
     expect(getMetaTag('keywords').getAttribute('content')).toBe('mern,react,node,mongodb');
     expect(getMetaTag('author').getAttribute('content')).toBe('Techinfoyt');
   });
+
+  it("should render custom meta tags and title correctly",async () => {
+    render(
+        <Layout
+          title="Test Title"
+          description="Test Description"
+          keywords="test,keywords"
+          author="Test Author"
+        >
+          <div>Test Children</div>
+        </Layout>
+    );
+
+    expect(document.title).toBe('Test Title');
+    expect(getMetaTag('description').getAttribute('content')).toBe('Test Description');
+    expect(getMetaTag('keywords').getAttribute('content')).toBe('test,keywords');
+    expect(getMetaTag('author').getAttribute('content')).toBe('Test Author');
+
+  });
+
+  it("should render with the correct styles", () => {
+    render(
+      <Layout />
+    )
+      const mainEelement = screen.getByRole('main');
+      expect(mainEelement).toHaveStyle('min-height: 70vh');
+    
+  })
 });

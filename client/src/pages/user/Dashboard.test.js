@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import React from 'react'
+import { useAuth } from '../../context/auth';
+import '@testing-library/jest-dom';
 
 let mockUser = {
   user: {
@@ -33,7 +35,7 @@ describe("Dashboard Component", () => {
     jest.clearAllMocks();
   })
 
-  it("should render the dashboard page", async () => {
+  it("should render the dashboard page when auth is present", async () => {
     render(
       <MemoryRouter initialEntries={["/dashboard"]}>
         <Routes>
@@ -45,6 +47,21 @@ describe("Dashboard Component", () => {
     expect(screen.getByText(mockUser.user.name)).not.toBeNull();
     expect(screen.getByText(mockUser.user.email)).not.toBeNull();
     expect(screen.getByText(mockUser.user.address)).not.toBeNull();
+    expect(screen.getByText('Profile')).not.toBeNull();
+    expect(screen.getByText('Orders')).not.toBeNull();
+  })
+
+  it("should render the dashboard page when auth is not present", async () => {
+    const mockEmptyUser = { user: {} };
+    useAuth.mockReturnValueOnce([mockEmptyUser]);
+
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText("undefined")).not.toBeInTheDocument();
     expect(screen.getByText('Profile')).not.toBeNull();
     expect(screen.getByText('Orders')).not.toBeNull();
   })

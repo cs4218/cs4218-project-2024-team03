@@ -3,6 +3,9 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import Orders from './Orders';
 import axios from 'axios';
 import React from 'react'
+import { useAuth } from '../../context/auth';
+import '@testing-library/jest-dom';
+
 
 jest.mock('axios');
 
@@ -46,6 +49,19 @@ const mockProducts = [
     },
     shipping: true
   },
+  {
+    name: "Product 3",
+    slug: "product-3",
+    description: "Product 3 description long long long long long long long description",
+    category: {name: "category3", slug: "category3"},
+    quantity: 50,
+    price: 100,
+    photo: {
+      data: "image1.jpg",
+      contentType: "image/jpg"
+    },
+    shipping: true
+  },
 ]
 
 const mockOrdersSuccess = {
@@ -82,6 +98,22 @@ const mockOrderFail = {
   ]
 }
 
+const mockOrderLongDescription = {
+  orders: [
+    {
+      status: "Delivered",
+      buyer: mockUser.user,
+      createdAt: new Date("2024-09-01T12:00:00.000Z"),
+      payment: {
+        success: true
+      },
+      products: [
+        mockProducts[2]
+      ]
+    }
+  ]
+}
+
 jest.mock('../../context/auth', () => ({
   useAuth: jest.fn(() => [mockUser, jest.fn()]) 
 }));
@@ -90,6 +122,22 @@ describe("Orders Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  it('should not fetch orders if auth token is not present', async () => {
+    useAuth.mockReturnValueOnce([{}, jest.fn()]);
+
+    render(
+      <MemoryRouter initialEntries={['/orders']}>
+        <Routes>
+          <Route path="/orders" element={<Orders />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(axios.get).not.toHaveBeenCalled();
+    });
+  })
 
   it("should be able to render the orders page when order is successful", async () => {
     axios.get.mockResolvedValueOnce({
@@ -159,4 +207,24 @@ describe("Orders Component", () => {
     await waitFor(() => {expect(axios.get).toHaveBeenCalledTimes(1)})
     expect(consoleSpy).toHaveBeenCalledWith(error)
   });
+
+  it('should trim long product descriptions to 30 characters', async () => {
+    axios.get.mockResolvedValueOnce({
+      data: mockOrderLongDescription.orders
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/orders']}>
+        <Routes>
+          <Route path="/orders" element={<Orders />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    const descriptionElement = await screen.findByText('Product 3 description long lon');
+    
+    expect(descriptionElement).toBeInTheDocument();
+    expect(descriptionElement).toHaveTextContent('Product 3 description long lon');
+    expect(descriptionElement.textContent.length).toBe(30);
+  });
+  
 })

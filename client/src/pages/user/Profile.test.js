@@ -5,6 +5,7 @@ import Profile from './Profile';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useAuth } from '../../context/auth';
+import '@testing-library/jest-dom';
 
 jest.mock('axios');
 jest.mock('react-hot-toast');
@@ -105,7 +106,6 @@ describe('Profile Component', () => {
 
 
     fireEvent.change(screen.getByPlaceholderText('Enter Your Name'), { target: { value: updatedUser.name } });
-    fireEvent.change(screen.getByPlaceholderText('Enter Your Email'), { target: { value: updatedUser.email } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: updatedUser.password} });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Phone'), { target: { value:updatedUser.phone } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Address'), { target: { value: updatedUser.address } });
@@ -128,6 +128,15 @@ describe('Profile Component', () => {
     expect(toast.success).toHaveBeenCalledWith('Profile Updated Successfully');
   })
 
+  it('should have email input field disabled', async () => {
+    render(
+      <MemoryRouter>
+        <Profile />
+      </MemoryRouter>
+    );
+    const emailInput = screen.getByPlaceholderText('Enter Your Email');
+    expect(emailInput).toBeDisabled();
+  })
 
   it('should display error message when localstorage cannot get user', async () => {
     axios.put.mockRejectedValueOnce({data: {
@@ -149,7 +158,6 @@ describe('Profile Component', () => {
 
 
     fireEvent.change(screen.getByPlaceholderText('Enter Your Name'), { target: { value: 'Username' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter Your Email'), { target: { value: 'username@example.com' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: '12345678' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Phone'), { target: { value: '1234567890' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Address'), { target: { value: '123 Street' } });
@@ -159,6 +167,28 @@ describe('Profile Component', () => {
     await waitFor(() => expect(axios.put).toHaveBeenCalled());
     expect(toast.error).toHaveBeenCalledWith("Something went wrong");
   })
+
+  it('should not update localStorage if server update fails', async () => {
+    const mockSetItem = jest.spyOn(Storage.prototype, 'setItem');
+    axios.put.mockRejectedValue(new Error('Update failed'));
+
+    render(
+      <MemoryRouter>
+        <Profile />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Name'), { target: { value: 'New Name' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: 'newpassword' } });
+    fireEvent.click(screen.getByText('UPDATE'));
+
+    await waitFor(() => {
+      expect(mockSetItem).not.toHaveBeenCalled();
+    });
+
+    mockSetItem.mockRestore();
+  });
+
 
   it('should display error message when updating profile fails from server', async () => {
     axios.put.mockResolvedValueOnce({
@@ -176,7 +206,6 @@ describe('Profile Component', () => {
     );
 
     fireEvent.change(screen.getByPlaceholderText('Enter Your Name'), { target: { value: 'Username' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter Your Email'), { target: { value: 'username@example.com' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Password'), { target: { value: '2323' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Phone'), { target: { value: '1234567890' } });
     fireEvent.change(screen.getByPlaceholderText('Enter Your Address'), { target: { value: '123 Street' } });
