@@ -172,12 +172,11 @@ describe("test ProductDetails component", () => {
     expect(nameEle).toBeInTheDocument();
   });
   it.failing(
-    "displays fallback values when receiving invalid product data",
+    "displays fallback values when receiving invalid product data (price is not a valid number)",
     async () => {
       axios.get.mockResolvedValueOnce({ data: [] });
       const INVALID_PRICE = "invalid string";
       sample_product.product.price = INVALID_PRICE;
-      console.log(sample_product);
       axios.get.mockResolvedValueOnce({
         data: sample_product,
       });
@@ -194,6 +193,31 @@ describe("test ProductDetails component", () => {
       await waitFor(() => expect(axios.get).toHaveBeenCalled());
       const priceEle = await screen.findByText(`Price :${INVALID_PRICE}`);
       expect(priceEle).not.toBeInTheDocument();
+      const priceEle2 = await screen.findByText(`Price : unavailable`);
+      expect(priceEle2).toBeInTheDocument();
+    }
+  );
+  it.failing(
+    "displays fallback values when receiving invalid product data (price is undefined)",
+    async () => {
+      axios.get.mockResolvedValueOnce({ data: [] });
+      sample_product.product.price = undefined;
+      axios.get.mockResolvedValueOnce({
+        data: sample_product,
+      });
+      axios.get.mockResolvedValueOnce({ data: { products: [] } });
+
+      render(
+        <Router.MemoryRouter initialEntries={["/"]}>
+          <Router.Routes>
+            <Router.Route path="/" element={<ProductDetails />} />
+          </Router.Routes>
+        </Router.MemoryRouter>
+      );
+      await waitFor(() => expect(axios.get).toHaveBeenCalled());
+      await waitFor(() => expect(axios.get).toHaveBeenCalled());
+      const priceEle = await screen.findByText(`Price : unavailable`);
+      expect(priceEle).toBeInTheDocument();
     }
   );
 });
