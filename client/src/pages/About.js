@@ -6,7 +6,7 @@ const About = () => {
     <Layout title={"About us - Ecommerce app"}>
       <div className="row contactus ">
         <div className="col-md-6 ">
-          <img
+          <img  
             src="/images/about.jpeg"
             alt="contactus"
             style={{ width: "100%" }}

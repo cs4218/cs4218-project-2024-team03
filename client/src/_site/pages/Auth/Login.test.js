@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
@@ -45,7 +45,7 @@ describe('Login Component', () => {
     });
 
     it('renders login form', () => {
-        const { getByText, getByPlaceholderText } = render(
+        render(
           <MemoryRouter initialEntries={['/login']}>
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -53,9 +53,9 @@ describe('Login Component', () => {
           </MemoryRouter>
         );
     
-        expect(getByText('LOGIN FORM')).toBeInTheDocument();
-        expect(getByPlaceholderText('Enter Your Email')).toBeInTheDocument();
-        expect(getByPlaceholderText('Enter Your Password')).toBeInTheDocument();
+        expect(screen.getByText('LOGIN FORM')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Enter Your Email')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Enter Your Password')).toBeInTheDocument();
       });
       it('inputs should be initially empty', () => {
         const { getByText, getByPlaceholderText } = render(
