@@ -9,15 +9,15 @@ import "@testing-library/jest-dom/extend-expect";
 jest.mock("axios");
 
 jest.mock("../context/auth", () => ({
-  useAuth: jest.fn(() => [null, jest.fn()]), // Mock useAuth hook to return null state and a mock function for setAuth
+  useAuth: jest.fn(() => [null, jest.fn()]),
 }));
 
 jest.mock("../context/cart", () => ({
-  useCart: jest.fn(() => [null, jest.fn()]), // Mock useCart hook to return null state and a mock function
+  useCart: jest.fn(() => [null, jest.fn()]),
 }));
 
 jest.mock("../context/search", () => ({
-  useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]), // Mock useSearch hook to return null state and a mock function
+  useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]),
 }));
 
 const name = "Beverages";
@@ -28,7 +28,7 @@ const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useParams: () => ({ slug }),
-  useNavigate: () => mockNavigate, // Mock navigate function
+  useNavigate: () => mockNavigate,
 }));
 
 const mockGetProductByCategoryData = {
@@ -170,7 +170,6 @@ describe("CategoryProduct Component", () => {
   });
 
   it("API call successfully fetches 0 product by category and renders no product", async () => {
-    // Mock API error response
     axios.get.mockResolvedValueOnce([]);
 
     const mockGetEmptyProductByCategory = {
@@ -210,7 +209,7 @@ describe("CategoryProduct Component", () => {
     expect(moreDetailsButtons.length).toBe(0);
   });
 
-  it("API call fetches 0 product when the category does not eits", async () => {
+  it("API call fetches 0 product when the category does not exits", async () => {
     // Mock API error response
     axios.get.mockResolvedValueOnce([]);
 
@@ -245,7 +244,7 @@ describe("CategoryProduct Component", () => {
     const moreDetailsButtons = screen.queryAllByRole("button", {
       name: /More Details/i,
     });
-    expect(moreDetailsButtons.length).toBe(0); // Expect no "More Details" buttons to be rendered
+    expect(moreDetailsButtons.length).toBe(0);
   });
 
   // this would fail because there is no error handling in the component

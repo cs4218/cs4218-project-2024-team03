@@ -34,18 +34,17 @@ jest.mock("axios");
 
 jest.mock("braintree-web-drop-in-react", () => ({
   __esModule: true,
-  default: jest.fn(), // Mock the DropIn component
+  default: jest.fn(), 
 }));
 
 jest.mock('react-hot-toast', () => ({
-  Toaster: () => <div data-testid="mock-toaster" />, // Mock the Toaster component
-  success: jest.fn(), // Mock success function
-  error: jest.fn(),   // Mock error function
+  Toaster: () => <div data-testid="mock-toaster" />,
+  success: jest.fn(),
+  error: jest.fn(),
 }));
 
 describe("CartPage Component", () => {
   afterEach(() => {
-    // useNavigate.mockReturnValue(navigate);
     jest.clearAllMocks();
   });
   
@@ -139,12 +138,10 @@ describe("CartPage Component", () => {
 
   });
   
-
-  
-  it("should render 'Please Login to to checkout' button if user is not authenticated and it navigates to login page onclick", async () => {
+  it("should render 'Please Login to to checkout' button if user is not authenticated and onclick navigates to login page", async () => {
     // Mock the navigate function
     const mockNavigate = jest.fn();
-    useNavigate.mockReturnValue(mockNavigate); // Set the mocked navigate function
+    useNavigate.mockReturnValue(mockNavigate);
 
     useAuth.mockReturnValue([{
       token: "",
@@ -167,7 +164,7 @@ describe("CartPage Component", () => {
     // Click the "Update Address" button
     fireEvent.click(screen.getByText("Plase Login to checkout"));
   
-    // Ensure the navigate function is called to go to the profile page
+    // Ensure the navigate function is called to go to the login page
     expect(mockNavigate).toHaveBeenCalledWith("/login", { state: "/cart" });
   });
 
@@ -258,11 +255,9 @@ describe("CartPage Component", () => {
       token: "testToken",
       user: { name: "John Doe" }
     }, jest.fn()]);
-
     
     useCart.mockReturnValue([mockCartItems, jest.fn()]);
 
-    // Mock API response for categories in the navigation bar
     axios.get.mockResolvedValueOnce({ data: [] });
     axios.get.mockResolvedValueOnce(mockClientTokenResponse);
 
@@ -291,7 +286,6 @@ describe("CartPage Component", () => {
 
     useCart.mockReturnValue([[], jest.fn()]);
 
-    // Mock API response for categories in the navigation bar
     axios.get.mockResolvedValueOnce({ data: [] });
     axios.get.mockResolvedValueOnce(mockClientTokenResponse);
 
@@ -304,7 +298,7 @@ describe("CartPage Component", () => {
       </MemoryRouter>
     );
 
-     const totalPrice = 0;
+    const totalPrice = 0;
     const totalPriceStr = totalPrice.toLocaleString("en-US", {
       style: "currency",
       currency: "USD",
@@ -321,33 +315,6 @@ describe("CartPage Component", () => {
     // Mock useCart to return the mockCartItems and a setter function
     const setCart = jest.fn();
     useCart.mockReturnValue([mockCartItems, setCart]);
-
-    const cartValueafterRemoveFirstItem = [
-      {
-        _id: '66eaf9afa81d7a284daa294e',
-        name: 'Coffee',
-        slug: 'coffee',
-        description: 'coffee description',
-        price: 5,
-        category: '66e6f3b6f0550841c1571dc1',
-        quantity: 2,
-        createdAt: '2024-09-18T16:02:55.706Z',
-        updatedAt: '2024-09-18T16:02:55.706Z',
-        __v: 0
-      },
-      {
-        _id: '66eaf9d2a81d7a284daa2963',
-        name: 'Cereal',
-        slug: 'cereal',
-        description: 'cereal description',
-        price: 4,
-        category: '66e6f3b6f0550841c1571dc1',
-        quantity: 1,
-        createdAt: '2024-09-18T16:03:30.710Z',
-        updatedAt: '2024-09-18T16:03:30.710Z',
-        __v: 0
-      }
-    ]
 
     // Mock API response for categories in the navigation bar
     axios.get.mockResolvedValueOnce({ data: [] });
@@ -369,7 +336,7 @@ describe("CartPage Component", () => {
     // Test for removing first item
     fireEvent.click(removeButton[0]);
     await waitFor(() => {
-      expect(setCart).toHaveBeenCalledWith(cartValueafterRemoveFirstItem);
+      expect(setCart).toHaveBeenCalledWith([mockCartItems[1], mockCartItems[2]]);
     });
   });
 
@@ -404,7 +371,7 @@ describe("CartPage Component", () => {
   it("should not display current address and display 'Update Address' button if the address does not exist", async () => {
     useAuth.mockReturnValue([{
       token: "testToken",
-      user: { name: "John Doe", address: null } // No address available
+      user: { name: "John Doe", address: null }
     }, jest.fn()]);
   
     useCart.mockReturnValue([mockCartItems, jest.fn()]);
@@ -430,7 +397,7 @@ describe("CartPage Component", () => {
   it("should navigate to profile page when 'Update Address' is clicked", async () => {
     // Mock the navigate function
     const mockNavigate = jest.fn();
-    useNavigate.mockReturnValue(mockNavigate); // Set the mocked navigate function
+    useNavigate.mockReturnValue(mockNavigate);
 
     useAuth.mockReturnValue([{
       token: "testToken",
@@ -561,7 +528,7 @@ describe("CartPage Component", () => {
 
   
   it("should handle payment process correctly and clear the cart", async () => {
-    const mockNavigate = jest.fn(); // Mock the navigate function
+    const mockNavigate = jest.fn();
     useNavigate.mockReturnValue(mockNavigate);
   
     // Create a mock instance of DropIn's requestPaymentMethod
@@ -572,7 +539,7 @@ describe("CartPage Component", () => {
     // Mock DropIn component to set the instance
     DropIn.mockImplementation(({ onInstance }) => {
       setTimeout(() => {
-        onInstance(instance);  // Simulate setting instance asynchronously
+        onInstance(instance);
       }, 0);
       return <div data-testid="dropin" />;
     });
@@ -639,7 +606,7 @@ describe("CartPage Component", () => {
     // Mock DropIn component to set the instance
     DropIn.mockImplementation(({ onInstance }) => {
       setTimeout(() => {
-        onInstance(instance);  // Simulate setting instance asynchronously
+        onInstance(instance);
       }, 0);
       return <div data-testid="dropin" />;
     });
@@ -670,12 +637,12 @@ describe("CartPage Component", () => {
 
     // Check if the button is enabled
     await waitFor(() => {
-      expect(paymentButton).toBeDisabled();  // Ensure button is enabled
+      expect(paymentButton).toBeDisabled();
     });
   });  
 
   it("should handle payment errors due to requestPaymentMethod gracefully", async () => {
-    const mockNavigate = jest.fn(); // Mock the navigate function
+    const mockNavigate = jest.fn();
     useNavigate.mockReturnValue(mockNavigate);
   
     // Create a mock instance of DropIn's requestPaymentMethod that simulates error
@@ -686,7 +653,7 @@ describe("CartPage Component", () => {
     // Mock DropIn component to set the instance
     DropIn.mockImplementation(({ onInstance }) => {
       setTimeout(() => {
-        onInstance(instance);  // Simulate setting instance asynchronously
+        onInstance(instance);
       }, 0);
       return <div data-testid="dropin" />;
     });
@@ -716,7 +683,7 @@ describe("CartPage Component", () => {
   
     // Check if the button is enabled
     await waitFor(() => {
-      expect(paymentButton).not.toBeDisabled();  // Ensure button is enabled
+      expect(paymentButton).not.toBeDisabled();
     });
   
     // Simulate button click
@@ -724,7 +691,7 @@ describe("CartPage Component", () => {
   
     // Wait for the error to be shown due to the rejected axios post request
     await waitFor(() => {
-      expect(instance.requestPaymentMethod).toHaveBeenCalled();  // Ensure the request was made
+      expect(instance.requestPaymentMethod).toHaveBeenCalled();
       // Ensure the cart was not cleared
       expect(setCart).not.toHaveBeenCalledWith([]);
     });
@@ -734,7 +701,7 @@ describe("CartPage Component", () => {
   });
 
   it.failing("handles braintree payment API call errors gracefully", async () => {
-    const mockNavigate = jest.fn(); // Mock the navigate function
+    const mockNavigate = jest.fn();
     useNavigate.mockReturnValue(mockNavigate);
   
     // Create a mock instance of DropIn's requestPaymentMethod that simulates error
@@ -745,7 +712,7 @@ describe("CartPage Component", () => {
     // Mock DropIn component to set the instance
     DropIn.mockImplementation(({ onInstance }) => {
       setTimeout(() => {
-        onInstance(instance);  // Simulate setting instance asynchronously
+        onInstance(instance);
       }, 0);
       return <div data-testid="dropin" />;
     });
