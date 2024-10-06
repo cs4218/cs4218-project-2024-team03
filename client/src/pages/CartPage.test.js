@@ -210,13 +210,44 @@ describe("CartPage Component", () => {
     expect(await screen.getByText("Your Cart Is Empty")).toBeInTheDocument();
   });
 
+  
+  it("should display the items and total number of items when there's only 1 item cart", async () => {
+    useAuth.mockReturnValue([{
+      token: "testToken",
+      user: { name: "John Doe" }
+    }, jest.fn()]);
+    
+    useCart.mockReturnValue([[mockCartItems[0]], jest.fn()]);
+
+    // Mock API response for categories in the navigation bar
+    axios.get.mockResolvedValueOnce({ data: [] });
+    axios.get.mockResolvedValueOnce(mockClientTokenResponse);
+
+
+    render(
+      <MemoryRouter initialEntries={["/cart"]}>
+        <Routes>
+          <Route path="/cart" element={<CartPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    // Test for item Milo
+    expect(await screen.getByText("Milo")).toBeInTheDocument();
+    expect(await screen.getByText("milo description")).toBeInTheDocument();
+    expect(await screen.getByText("Price : 2")).toBeInTheDocument();
+
+     // Test for total number of items
+     expect(await screen.getByText("You Have 1 items in your cart")).toBeInTheDocument();
+  });
+
   it("should display the items and total number of items when there are more than 1 items in the cart", async () => {
     useAuth.mockReturnValue([{
       token: "testToken",
       user: { name: "John Doe" }
     }, jest.fn()]);
     
-    useCart.mockReturnValue([mockCartItems, jest.fn()]);
+    useCart.mockReturnValue([[mockCartItems[0], mockCartItems[1]], jest.fn()]);
 
     // Mock API response for categories in the navigation bar
     axios.get.mockResolvedValueOnce({ data: [] });
@@ -240,14 +271,9 @@ describe("CartPage Component", () => {
     expect(await screen.getByText("Coffee")).toBeInTheDocument();
     expect(await screen.getByText("coffee description")).toBeInTheDocument();
     expect(await screen.getByText("Price : 5")).toBeInTheDocument();
-    
-    // Test for item Cereal
-    expect(await screen.getByText("Cereal")).toBeInTheDocument();
-    expect(await screen.getByText("cereal description")).toBeInTheDocument();
-    expect(await screen.getByText("Price : 4")).toBeInTheDocument();
 
     // Test for total number of items
-    expect(await screen.getByText("You Have 3 items in your cart")).toBeInTheDocument();
+    expect(await screen.getByText("You Have 2 items in your cart")).toBeInTheDocument();
   });
   
   it("should calculate the total price correctly when there are more than 1 items", async () => {
