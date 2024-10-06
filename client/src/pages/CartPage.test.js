@@ -210,8 +210,12 @@ describe("CartPage Component", () => {
     expect(await screen.getByText("Your Cart Is Empty")).toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   
   it("should display the items and total number of items when there's only 1 item cart", async () => {
+=======
+   it("should display the items and total number of items when there are only 1 item in the cart", async () => {
+>>>>>>> dc77e88 (add test for cartpage)
     useAuth.mockReturnValue([{
       token: "testToken",
       user: { name: "John Doe" }
@@ -236,9 +240,15 @@ describe("CartPage Component", () => {
     expect(await screen.getByText("Milo")).toBeInTheDocument();
     expect(await screen.getByText("milo description")).toBeInTheDocument();
     expect(await screen.getByText("Price : 2")).toBeInTheDocument();
+<<<<<<< HEAD
 
      // Test for total number of items
      expect(await screen.getByText("You Have 1 items in your cart")).toBeInTheDocument();
+=======
+    
+    // Test for total number of items
+    expect(await screen.getByText("You Have 1 items in your cart")).toBeInTheDocument();
+>>>>>>> dc77e88 (add test for cartpage)
   });
 
   it("should display the items and total number of items when there are more than 1 items in the cart", async () => {
@@ -271,7 +281,11 @@ describe("CartPage Component", () => {
     expect(await screen.getByText("Coffee")).toBeInTheDocument();
     expect(await screen.getByText("coffee description")).toBeInTheDocument();
     expect(await screen.getByText("Price : 5")).toBeInTheDocument();
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> dc77e88 (add test for cartpage)
     // Test for total number of items
     expect(await screen.getByText("You Have 2 items in your cart")).toBeInTheDocument();
   });
