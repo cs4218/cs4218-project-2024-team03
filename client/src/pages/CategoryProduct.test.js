@@ -249,7 +249,7 @@ describe("CategoryProduct Component", () => {
   });
 
   // this would fail because there is no error handling in the component
-  xit("handles API call errors gracefully", async () => {
+  it.failing("handles API call errors gracefully", async () => {
     // observe console.error
     const consoleSpy = jest.spyOn(console, "error");
     consoleSpy.mockImplementation(() => {

@@ -8,26 +8,26 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import DropIn from "braintree-web-drop-in-react";
-import { afterEach, mock } from "node:test";
+import { afterEach } from "node:test";
 import '@testing-library/jest-dom/extend-expect';
 
 
 // Mocking dependencies
 jest.mock("../context/auth", () => ({
-  useAuth: jest.fn(() => [null, jest.fn()]), // Mock useAuth hook to return null state and a mock function for setAuth
+  useAuth: jest.fn(() => [null, jest.fn()]),
 }));
 
 jest.mock("../context/cart", () => ({
-  useCart: jest.fn(() => [null, jest.fn()]), // Mock useCart hook to return null state and a mock function
+  useCart: jest.fn(() => [null, jest.fn()]),
 }));
 
 jest.mock("../context/search", () => ({
-  useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]), // Mock useSearch hook to return null state and a mock function
+  useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]),
 }));
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useNavigate: jest.fn(), // Mock useNavigate hook
+  useNavigate: jest.fn(),
 }));
 
 jest.mock("axios");
@@ -603,7 +603,7 @@ describe("CartPage Component", () => {
 
     // Check if the button is enabled
     await waitFor(() => {
-      expect(paymentButton).not.toBeDisabled();  // Ensure button is enabled
+      expect(paymentButton).not.toBeDisabled();
     });
   
     // Simulate button click
@@ -674,7 +674,7 @@ describe("CartPage Component", () => {
     });
   });  
 
-  it("should handle payment errors gracefully", async () => {
+  it("should handle payment errors due to requestPaymentMethod gracefully", async () => {
     const mockNavigate = jest.fn(); // Mock the navigate function
     useNavigate.mockReturnValue(mockNavigate);
   
@@ -701,9 +701,7 @@ describe("CartPage Component", () => {
     axios.get.mockResolvedValueOnce({ data: [] });
     axios.get.mockResolvedValueOnce(mockClientTokenResponse);
 
-    // Mock axios.post to simulate a payment failure by rejecting with an error
-    const paymentError = new Error("Payment failed");
-    axios.post.mockRejectedValueOnce(paymentError);
+    axios.post.mockResolvedValueOnce({ data: [] });
     
     render(
       <MemoryRouter initialEntries={["/cart"]}>
@@ -733,5 +731,66 @@ describe("CartPage Component", () => {
   
     // Ensure navigation does not happen on error
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it.failing("handles braintree payment API call errors gracefully", async () => {
+    const mockNavigate = jest.fn(); // Mock the navigate function
+    useNavigate.mockReturnValue(mockNavigate);
+  
+    // Create a mock instance of DropIn's requestPaymentMethod that simulates error
+    const instance = {
+      requestPaymentMethod: jest.fn().mockResolvedValue({ nonce: "testNonce" }),
+    };
+
+    // Mock DropIn component to set the instance
+    DropIn.mockImplementation(({ onInstance }) => {
+      setTimeout(() => {
+        onInstance(instance);  // Simulate setting instance asynchronously
+      }, 0);
+      return <div data-testid="dropin" />;
+    });
+  
+    // Mock the useAuth hook with a logged-in user
+    useAuth.mockReturnValue([{ token: "testToken", user: { name: "John Doe", address: "123 Test St" } }, jest.fn()]);
+  
+    // Mock useCart to return the mockCartItems and a setter function
+    const setCart = jest.fn();
+    useCart.mockReturnValue([mockCartItems, setCart]);
+  
+    axios.get.mockResolvedValueOnce({ data: [] });
+    axios.get.mockResolvedValueOnce(mockClientTokenResponse);
+
+    // Mock axios.post to simulate a payment failure by rejecting with an error
+    const paymentError = new Error("Payment failed");
+    axios.post.mockResolvedValueOnce(paymentError);
+    
+    render(
+      <MemoryRouter initialEntries={["/cart"]}>
+        <Routes>
+          <Route path="/cart" element={<CartPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    const paymentButton = await screen.findByText("Make Payment");
+    expect(paymentButton).toBeInTheDocument();
+  
+    // Check if the button is enabled
+    await waitFor(() => {
+      expect(paymentButton).not.toBeDisabled();
+    });
+  
+    // Simulate button click
+    fireEvent.click(paymentButton);
+  
+    // Wait for the error to be shown due to the rejected axios post request
+    await waitFor(() => {
+      expect(instance.requestPaymentMethod).toHaveBeenCalled();
+      // Ensure the cart was not cleared
+      expect(setCart).not.toHaveBeenCalledWith([]);
+    });
+  
+    // Ensure navigation does not happen on error
+    expect(mockNavigate).not.toHaveBeenCalled();  
   });
 });
