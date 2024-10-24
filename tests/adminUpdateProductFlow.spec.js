@@ -32,7 +32,7 @@ test.describe("admin update product", async () => {
   });
 
 
-  test.fail("login -> go to dashboard -> update product -> check product -> delete product -> logout", async ({
+  test("login -> go to dashboard -> update product -> check product -> logout", async ({
     page,
   }) => {
     await page.getByText("ADMIN").click();
@@ -110,6 +110,40 @@ test.describe("admin update product", async () => {
 
     expect(
       page.getByText("Facial Tissue").first()
+    ).not.toBeVisible();
+  });
+
+  
+  test("login -> go to dashboard -> delete product -> check product @ dashboard & home -> logout", async ({
+    page,
+  }) => {
+    await page.getByText("ADMIN").click();
+    await page.getByText("DASHBOARD").click();
+    await page.waitForURL("http://localhost:3000/dashboard/admin", {
+      timeout: 100000,
+    });
+    await page.getByText("Products").click();
+    await page.getByText("mdba").click();
+    await page.waitForURL(
+      "http://localhost:3000/dashboard/admin/product/mdba",
+      { timeout: 100000 }
+    );
+    
+    await page.getByRole("button", { name: "DELETE PRODUCT" }).click();
+
+    page.on('dialog', async (dialog) => {
+      expect(dialog.message()).toContain('Are You Sure want to delete this product ?');
+      await dialog.accept();
+    });
+
+    expect(
+      page.getByText("mdba").first()
+    ).not.toBeVisible();
+    
+    await page.getByText("HOME").first().click();
+    
+    expect(
+      page.getByText("mdba").first()
     ).not.toBeVisible();
   });
 });
