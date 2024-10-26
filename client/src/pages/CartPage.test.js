@@ -210,12 +210,8 @@ describe("CartPage Component", () => {
     expect(await screen.getByText("Your Cart Is Empty")).toBeInTheDocument();
   });
 
-<<<<<<< HEAD
   
   it("should display the items and total number of items when there's only 1 item cart", async () => {
-=======
-   it("should display the items and total number of items when there are only 1 item in the cart", async () => {
->>>>>>> dc77e88 (add test for cartpage)
     useAuth.mockReturnValue([{
       token: "testToken",
       user: { name: "John Doe" }
