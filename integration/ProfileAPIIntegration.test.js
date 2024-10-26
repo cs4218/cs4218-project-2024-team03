@@ -1,58 +1,65 @@
 import { expect } from "@playwright/test";
 import axios from "axios";
 
+import userModel from '../models/userModel';
+import mongoose from "mongoose";
+import dotenv from 'dotenv';
+import { hashPassword } from '../helpers/authHelper';
+
+dotenv.config({ path: './.env' });
+
 let token;
 const baseUrl = "http://localhost:6060/api/v1";
 const profileBaseUrl = baseUrl + "/auth/profile";
 
-// Please update the email and password below based on the user in your database
-const email = "test@email.com"
-const password = "password"
-
-let originalName
 
 describe("Test the profile endpoints", () => {
+  let user;
+  let password = 'password';
   beforeEach(async () => {
+    await mongoose.connect(process.env.MONGO_URL);
+    await mongoose.connection.createCollection('users');
+    const hashedPassword = await hashPassword(password);
+
+    user = new userModel({
+      name: "newUser", 
+      email: "email@email.com", 
+      password: hashedPassword,
+      phone: "12345678", 
+      address: "123 address", 
+      answer: "safeAnswer", 
+      role: 0
+    });
+
+    await user.save();
+
     try {
       const res = await axios({
         method: "POST",
         url: baseUrl + "/auth/login",
         data: {
-          email: email,
-          password: password,
+          email: user.email,
+          password: 'password',
         },
       })
 
       if (res && res.data.success) {
         token = res.data.token;
-        originalName = res.data.user.name
       }
     } catch (err) {
       console.error("Failed to get user token:", err);
     }
   })
 
-  afterAll(async () => {
-    await axios({
-      method: "PUT",
-      url: profileBaseUrl,
-      data: {
-        name: originalName,
-        email: email,
-        password: password,
-        phone: "1234567890",
-        address: "123 Test Street",
-      },
-      headers: {
-        Authorization: token,
-      },
-    })
+  afterEach(async() => {
+    await userModel.deleteOne({ email: user.email });
+    await mongoose.disconnect();
   })
 
   it('should be able to update existing user', async () => {
     const updatedUserData = {
-      name: "Test User 1", // Should be different from the original name
-      email: email,
+      name: "Test User 1", 
+      email: user.email,
       password: password,
       phone: "1234567890",
       address: "123 Test Street",
@@ -78,11 +85,11 @@ describe("Test the profile endpoints", () => {
 
   it('should return error when updating password with less than 6 characters', async () => {
     const updatedUserData = {
-      name: originalName,
-      email: email,
+      name: user.name,
+      email: user.email,
       password: "pass",
-      phone: "1234567890",
-      address: "123 Test Street",
+      phone: user.phone,
+      address: user.address,
     }
 
       const res = await axios({
@@ -103,11 +110,11 @@ describe("Test the profile endpoints", () => {
 
   it('should be able to update password when password is 6 characters long', async () => {
     const updatedUserData = {
-      name: originalName,
-      email: email,
-      password: 'validPassword',
-      phone: "1234567890",
-      address: "123 Test Street",
+      name: user.name,
+      email: user.email,
+      password: "validPassword",
+      phone: user.phone,
+      address: user.address,
     }
 
     const res = await axios({
