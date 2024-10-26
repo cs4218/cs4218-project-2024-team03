@@ -6,7 +6,9 @@ const baseUrl = "http://localhost:6060/api/v1";
 const registerUrl = baseUrl + "/auth/register";
 const loginUrl = baseUrl + "/auth/login";
 
-const newUserEmail = `test${randomInt(10000)}@test.com`;
+describe("Test the authorization endpoints", () => {
+
+  const newUserEmail = `test${randomInt(10000)}@test.com`;
 
   it("should register a new user", async () => {
     const res = await axios({
