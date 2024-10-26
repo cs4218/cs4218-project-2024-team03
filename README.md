@@ -27,3 +27,15 @@ The other members in the team will be able to see an existing team with your tea
 * Products.test.js
 * UpdateProduct.test.js
 * Users.test.js
+
+# Chen Shuwen:
+* About.test.js 
+* CartPage.test.js 
+* Categories.test.js
+* CategoryProduct.test.js
+* integration/CartPageAPIIntegration.test.js
+* integration/ProductAPIIntegration.test.js
+* integration/ProductByCategoryIntegration.test.js
+* tests/userUpdateAdressFlow.test.cjs
+* tests/userViewAboutPageFlow.spec.js
+* tests/userViewAllProductCategoryFLow.spec.js
