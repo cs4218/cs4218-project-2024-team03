@@ -39,3 +39,16 @@ The other members in the team will be able to see an existing team with your tea
 * tests/userUpdateAdressFlow.spec.cjs
 * tests/userViewAboutPageFlow.spec.js
 * tests/userViewAllProductCategoryFLow.spec.js
+
+# Wu Changjun:
+* Dashboard.test.js
+* Orders.test.js
+* Profile.test.js
+* CategoryForm.test.js
+* Layout.test.js
+* UserMenu.test.js
+* DashboardAuthProviderIntegration.test.js
+* ProfileAPIIntegration.test.js
+* OrdersAPIIntegration.test.js
+* userUpdateProfileFlow.spec.js
+* userViewDashboardFlow.spec.js
