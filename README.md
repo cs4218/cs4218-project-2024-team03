@@ -36,6 +36,6 @@ The other members in the team will be able to see an existing team with your tea
 * integration/CartPageAPIIntegration.test.js
 * integration/ProductAPIIntegration.test.js
 * integration/ProductByCategoryIntegration.test.js
-* tests/userUpdateAdressFlow.test.cjs
+* tests/userUpdateAdressFlow.spec.cjs
 * tests/userViewAboutPageFlow.spec.js
 * tests/userViewAllProductCategoryFLow.spec.js
