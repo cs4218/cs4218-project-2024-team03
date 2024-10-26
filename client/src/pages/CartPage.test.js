@@ -235,8 +235,9 @@ describe("CartPage Component", () => {
     expect(await screen.getByText("Milo")).toBeInTheDocument();
     expect(await screen.getByText("milo description")).toBeInTheDocument();
     expect(await screen.getByText("Price : 2")).toBeInTheDocument();
-     // Test for total number of items
-     expect(await screen.getByText("You Have 1 items in your cart")).toBeInTheDocument();
+    
+    // Test for total number of items
+    expect(await screen.getByText("You Have 1 items in your cart")).toBeInTheDocument();
   });
 
   it("should display the items and total number of items when there are more than 1 items in the cart", async () => {

@@ -12,3 +12,30 @@ If your group number is a single digit, i.e 2024-Team1 is fine as well.)
 The other members in the team will be able to see an existing team with your team number in the “Join an existing team” section. Click Join.
 
 ## Step 3. All of you should be able to see the acceptance page. Click on the assignment link to see the project on GitHub.
+
+
+# Team member contributions and files 
+## Stevan Gerard Gunawan :
+* adminCreateCategoryFlow.spec.js 
+* adminUpdateProductFlow.spec.js 
+* AuthAdminAPIIntegration.test.js
+* AdminMenu.test.js
+* AdminOrders.test.js
+* AdminDashboard.test.js
+* CreateCategory.test.js
+* CreateProduct.test.js
+* Products.test.js
+* UpdateProduct.test.js
+* Users.test.js
+
+# Chen Shuwen:
+* About.test.js 
+* CartPage.test.js 
+* Categories.test.js
+* CategoryProduct.test.js
+* integration/CartPageAPIIntegration.test.js
+* integration/ProductAPIIntegration.test.js
+* integration/ProductByCategoryIntegration.test.js
+* tests/userUpdateAdressFlow.spec.cjs
+* tests/userViewAboutPageFlow.spec.js
+* tests/userViewAllProductCategoryFLow.spec.js

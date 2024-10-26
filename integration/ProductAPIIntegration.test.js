@@ -59,7 +59,6 @@
             "Content-Type": "multipart/form-data",
         },
         });
-        console.log("11111111111", res)
         expect(res.status).toBe(201);
         expect(res.data.success).toBe(true);
         expect(res.data.message).toEqual("Product Created Successfully");
@@ -90,8 +89,6 @@
         formData.append("quantity", "20");
         formData.append("photo", new Blob(["test photo content"], { type: "image/jpeg" }), "photo.jpg");
         formData.append("category", categoryId);
-
-        console.log("3333", formData, `${productBaseUrl}/update-product/${createdProductId}`)
 
         const res = await axios({
         method: "PUT",
