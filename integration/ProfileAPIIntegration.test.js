@@ -1,0 +1,130 @@
+import { expect } from "@playwright/test";
+import axios from "axios";
+
+let token;
+const baseUrl = "http://localhost:6060/api/v1";
+const profileBaseUrl = baseUrl + "/auth/profile";
+
+// Please update the email and password below based on the user in your database
+const email = "test@email.com"
+const password = "password"
+
+let originalName
+
+describe("Test the profile endpoints", () => {
+  beforeEach(async () => {
+    try {
+      const res = await axios({
+        method: "POST",
+        url: baseUrl + "/auth/login",
+        data: {
+          email: email,
+          password: password,
+        },
+      })
+
+      if (res && res.data.success) {
+        token = res.data.token;
+        originalName = res.data.user.name
+      }
+    } catch (err) {
+      console.error("Failed to get user token:", err);
+    }
+  })
+
+  afterAll(async () => {
+    await axios({
+      method: "PUT",
+      url: profileBaseUrl,
+      data: {
+        name: originalName,
+        email: email,
+        password: password,
+        phone: "1234567890",
+        address: "123 Test Street",
+      },
+      headers: {
+        Authorization: token,
+      },
+    })
+  })
+
+  it('should be able to update existing user', async () => {
+    const updatedUserData = {
+      name: "Test User 1", // Should be different from the original name
+      email: email,
+      password: password,
+      phone: "1234567890",
+      address: "123 Test Street",
+    }
+
+    const res = await axios({
+      method: "PUT",
+      url: profileBaseUrl,
+      data: {
+        ...updatedUserData
+      },
+      headers: {
+        Authorization: token,
+      },
+    })
+
+    expect(res.status).toBe(200);
+    expect(res.statusText).toBe("OK");
+    expect(res.data.success).toBe(true);
+    expect(res.data.message).toBe("Profile Updated SUccessfully");
+    expect(res.data.updatedUser.name).toBe(updatedUserData.name);
+  })
+
+  it('should return error when updating password with less than 6 characters', async () => {
+    const updatedUserData = {
+      name: originalName,
+      email: email,
+      password: "pass",
+      phone: "1234567890",
+      address: "123 Test Street",
+    }
+
+      const res = await axios({
+        method: "PUT",
+        url: profileBaseUrl,
+        data: {
+          ...updatedUserData
+        },
+        headers: {
+          Authorization: token,
+        },
+      })
+
+      expect(res.status).toBe(200);
+      expect(res.statusText).toBe("OK");
+      expect(res.data.error).toBe("Passsword is required and 6 character long")
+  });
+
+  it('should be able to update password when password is 6 characters long', async () => {
+    const updatedUserData = {
+      name: originalName,
+      email: email,
+      password: 'validPassword',
+      phone: "1234567890",
+      address: "123 Test Street",
+    }
+
+    const res = await axios({
+      method: "PUT",
+      url: profileBaseUrl,
+      data: {
+        ...updatedUserData
+      },
+      headers: {
+        Authorization: token,
+      },
+    })
+
+    expect(res.status).toBe(200);
+    expect(res.statusText).toBe("OK");
+    expect(res.data.success).toBe(true);
+    expect(res.data.message).toBe("Profile Updated SUccessfully");
+    expect(res.data.updatedUser.name).toBe(updatedUserData.name);
+  })
+})
