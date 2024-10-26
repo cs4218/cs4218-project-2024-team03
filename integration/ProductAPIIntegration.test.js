@@ -59,7 +59,6 @@
             "Content-Type": "multipart/form-data",
         },
         });
-
         expect(res.status).toBe(201);
         expect(res.data.success).toBe(true);
         expect(res.data.message).toEqual("Product Created Successfully");
