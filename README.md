@@ -70,3 +70,13 @@ The other members in the team will be able to see an existing team with your tea
 * Pagenotfound.js.
 * integration/AuthAPIIntegration.test.js
 * tests/userRegisterLoginFlow.spec.js
+
+## Li Xintong
+* SearchInput.test.js
+* Header.test.js
+* Contact.test.js
+* ProductDetails.test.js
+* Search.test.js
+* integration/CategoryAPIIntegration.test.js
+* tests/userPurchaseProductFlow.spec.cjs
+* tests/adminCreateProductFlow.spec.cjs
