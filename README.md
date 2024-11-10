@@ -32,6 +32,7 @@ The other members in the team will be able to see an existing team with your tea
 * Products.test.js
 * UpdateProduct.test.js
 * Users.test.js
+* test-create-product.jmx (Including summary csv files in cs4218-project-2024-team03\jmeter\test_create_product)
 
 ## Chen Shuwen:
 
