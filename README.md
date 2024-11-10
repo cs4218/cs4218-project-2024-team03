@@ -71,8 +71,10 @@ The other members in the team will be able to see an existing team with your tea
 * Pagenotfound.js.
 * integration/AuthAPIIntegration.test.js
 * tests/userRegisterLoginFlow.spec.js
+* jmeter/test_plan_buy_product.jmx
 
 ## Li Xintong
+
 * SearchInput.test.js
 * Header.test.js
 * Contact.test.js
